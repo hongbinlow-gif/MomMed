@@ -2,173 +2,268 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Care Tracker</title>
-  
-  <!-- iOS PWA Config -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Mom's Med Tracker</title>
+  <link rel="apple-touch-icon" href="https://img.icons8.com/color/180/pill.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Care Tracker">
-  <link rel="apple-touch-icon" href="https://img.icons8.com/color/180/medical-heart.png">
-  
   <style>
     :root {
       --bg: #F2F2F7;
-      --card: #FFFFFF;
-      --accent: #007AFF;
-      --accent-light: #EBF5FF;
-      --text: #000000;
+      --card-bg: #FFFFFF;
+      --primary: #007AFF;
+      --success: #34C759;
+      --text: #1C1C1E;
       --subtext: #8E8E93;
-      --green: #34C759;
-      --red: #FF3B30;
       --border: #E5E5EA;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 90px; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px 16px 100px 16px;
+      -webkit-tap-highlight-color: transparent;
+    }
     
-    header { padding: 20px 20px 10px; font-size: 28px; font-weight: 700; }
+    /* Header Card with Circular Progress Ring */
+    .header-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid var(--border);
+    }
+    .ring-container {
+      position: relative;
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .ring-container svg {
+      transform: rotate(-90deg);
+      width: 70px;
+      height: 70px;
+    }
+    .ring-bg {
+      stroke: var(--border);
+      stroke-width: 6;
+      fill: none;
+    }
+    .ring-fill {
+      stroke: var(--primary);
+      stroke-width: 6;
+      fill: none;
+      stroke-linecap: round;
+      stroke-dasharray: 188;
+      stroke-dashoffset: 188;
+      transition: stroke-dashoffset 0.4s ease;
+    }
+    .ring-text {
+      position: absolute;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      text-align: center;
+    }
+
+    .header-info h1 { font-size: 22px; font-weight: 700; margin: 0 0 2px 0; }
+    .header-info .subtitle { color: var(--subtext); font-size: 13px; margin: 0; }
+
+    /* Grouped Card for Morning Protocol */
+    .group-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid var(--border);
+    }
+    .group-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--subtext);
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    .sub-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .sub-item:last-child { border-bottom: none; }
+    .med-info h3 { margin: 0; font-size: 16px; font-weight: 600; }
+    .med-info p { margin: 2px 0 0 0; font-size: 12px; color: var(--subtext); }
+
+    /* Single Card */
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid var(--border);
+    }
+
+    /* Action Buttons */
+    .btn-check {
+      background-color: var(--bg);
+      color: var(--subtext);
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-check.done {
+      background-color: var(--success);
+      color: white;
+      border-color: var(--success);
+    }
+
+    /* Symptom Slider Styling */
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .slider {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 8px;
+      border-radius: 4px;
+      background: var(--border);
+      outline: none;
+      margin: 12px 0 6px 0;
+    }
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--subtext);
+      margin-bottom: 12px;
+    }
     
-    .container { padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }
+    textarea {
+      width: 100%; border: 1px solid var(--border); border-radius: 8px;
+      padding: 8px; box-sizing: border-box; font-family: inherit; margin-top: 4px; font-size: 14px;
+    }
 
-    /* Header Banner */
-    .banner { background: var(--accent-light); border: 1px solid rgba(0, 122, 255, 0.2); border-radius: 20px; padding: 18px; }
-    .banner-top { display: flex; justify-content: space-between; align-items: center; }
-    .greeting { font-size: 14px; color: var(--subtext); font-weight: 500; }
-    .title { font-size: 26px; font-weight: 800; margin-top: 2px; }
-    .ring { width: 50px; height: 50px; border-radius: 50%; border: 4px solid #D0E4FF; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--accent); }
-    .banner-divider { height: 1px; background: var(--border); margin: 12px 0; }
-    .banner-bottom { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; }
-    .plan-tag { color: var(--accent); }
-    .day-tag { color: var(--subtext); }
-
-    .section-title { font-size: 20px; font-weight: 700; margin-top: 6px; }
-
-    /* Dose Card */
-    .card { background: var(--card); border-radius: 20px; padding: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
-    .card.taken { background: rgba(52, 199, 89, 0.05); border-color: rgba(52, 199, 89, 0.3); }
-    
-    .card-header { display: flex; justify-content: space-between; align-items: center; }
-    .badge { background: var(--accent-light); color: var(--accent); font-size: 13px; font-weight: 600; padding: 6px 10px; border-radius: 8px; }
-    .card.taken .badge { background: #E5F9ED; color: var(--green); }
-    .check-icon { color: var(--green); font-size: 20px; font-weight: bold; }
-
-    .pill-item { display: flex; justify-content: space-between; align-items: center; }
-    .pill-name { font-weight: 700; font-size: 16px; }
-    .pill-cat { font-size: 12px; color: var(--subtext); font-weight: 400; }
-    .pill-sub { font-size: 13px; color: var(--subtext); margin-top: 2px; }
-    .pill-dosage { background: var(--bg); font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 6px; }
-
-    .btn { background: var(--accent); color: white; border: none; width: 100%; height: 50px; border-radius: 14px; font-size: 17px; font-weight: 700; cursor: pointer; margin-top: 4px; transition: transform 0.1s; }
-    .btn:active { transform: scale(0.98); }
-    .btn.taken { background: #E5E5EA; color: var(--text); }
-
-    /* Discomfort Card */
-    .slider-header { display: flex; justify-content: space-between; font-size: 14px; color: var(--subtext); }
-    .slider-score { font-weight: 700; font-size: 16px; color: var(--green); }
-    .slider-score.high { color: var(--red); }
-    input[type=range] { width: 100%; margin: 8px 0; accent-color: var(--accent); }
-    
-    input[type=text] { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); font-size: 15px; outline: none; }
-
-    /* Bottom Nav Bar */
-    .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-top: 1px solid var(--border); display: flex; height: 65px; padding-bottom: 10px; }
-    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: var(--subtext); font-weight: 600; cursor: pointer; }
-    .nav-item.active { color: var(--accent); }
+    /* Bottom Nav Bar (2 Tabs) */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(10px); display: flex; border-top: 1px solid var(--border);
+      padding: 8px 0 22px 0;
+    }
+    .nav-item { flex: 1; text-align: center; color: var(--subtext); font-size: 11px; cursor: pointer; }
+    .nav-item.active { color: var(--primary); font-weight: 600; }
     .nav-icon { font-size: 20px; margin-bottom: 2px; }
-
-    .page { display: none; }
-    .page.active { display: flex; flex-direction: column; gap: 16px; }
-
-    .history-card { background: var(--card); border-radius: 14px; padding: 14px; border: 1px solid var(--border); }
+    
+    .hidden { display: none; }
+    .history-log { font-size: 14px; border-bottom: 1px solid var(--border); padding: 12px 0; }
   </style>
 </head>
 <body>
 
-  <header>Care Tracker</header>
-
-  <div class="container">
-    <!-- TODAY PAGE -->
-    <div id="today-page" class="page active">
-      
-      <!-- Banner -->
-      <div class="banner">
-        <div class="banner-top">
-          <div>
-            <div id="greeting" class="greeting">Good morning,</div>
-            <div class="title">Hi mummy 👋</div>
-          </div>
-          <div id="progress-ring" class="ring">1/14</div>
-        </div>
-        <div class="banner-divider"></div>
-        <div class="banner-bottom">
-          <span class="plan-tag">🏥 14-Day Recovery Plan</span>
-          <span id="day-text" class="day-tag">Day 1 of 14</span>
-        </div>
+  <!-- TODAY TAB -->
+  <div id="app-today">
+    <!-- Header with Progress Ring -->
+    <div class="header-card">
+      <div class="ring-container">
+        <svg>
+          <circle class="ring-bg" cx="35" cy="35" r="30"></circle>
+          <circle id="progress-ring" class="ring-fill" cx="35" cy="35" r="30"></circle>
+        </svg>
+        <div class="ring-text" id="ring-label">1/14</div>
       </div>
-
-      <div class="section-title">Today's Schedule</div>
-
-      <!-- Doses -->
-      <div id="morning-card" class="card">
-        <div class="card-header">
-          <div class="badge">⏰ 7:30 AM — Before Breakfast</div>
-          <span id="morning-check" class="check-icon" style="display:none;">✓</span>
-        </div>
-        <div class="pill-item">
-          <div>
-            <div class="pill-name">Dexlansoprazole <span class="pill-cat">• Acid Reducer</span></div>
-            <div class="pill-sub">30 mins before breakfast</div>
-          </div>
-          <div class="pill-dosage">1 Pill</div>
-        </div>
-        <div class="pill-item">
-          <div>
-            <div class="pill-name">Domperidone <span class="pill-cat">• Anti-Bloat</span></div>
-            <div class="pill-sub">30 mins before breakfast</div>
-          </div>
-          <div class="pill-dosage">1 Pill</div>
-        </div>
-        <button id="morning-btn" class="btn" onclick="toggleDose('morning')">Take Morning Doses</button>
+      <div class="header-info">
+        <h1 id="day-counter">Day 1 of 14</h1>
+        <div class="subtitle" id="today-date"></div>
       </div>
-
-      <div id="evening-card" class="card">
-        <div class="card-header">
-          <div class="badge">⏰ 5:30 PM — Before Dinner</div>
-          <span id="evening-check" class="check-icon" style="display:none;">✓</span>
-        </div>
-        <div class="pill-item">
-          <div>
-            <div class="pill-name">Domperidone <span class="pill-cat">• Anti-Bloat</span></div>
-            <div class="pill-sub">30 mins before dinner</div>
-          </div>
-          <div class="pill-dosage">1 Pill</div>
-        </div>
-        <button id="evening-btn" class="btn" onclick="toggleDose('evening')">Take Evening Dose</button>
-      </div>
-
-      <div class="section-title">Daily Doctor Log</div>
-
-      <!-- Discomfort Card -->
-      <div class="card">
-        <div class="slider-header">
-          <span>Stomach Discomfort Level</span>
-          <span id="pain-val" class="slider-score">2/10</span>
-        </div>
-        <input type="range" id="pain-slider" min="1" max="10" value="2" onchange="onPainChange(this.value)">
-        <input type="text" id="notes-input" placeholder="How are you feeling today? (optional)" onchange="saveData()">
-      </div>
-
     </div>
 
-    <!-- HISTORY PAGE -->
-    <div id="history-page" class="page">
-      <div class="section-title">Log History</div>
-      <div id="history-list"></div>
+    <!-- MORNING GROUP BOX -->
+    <div class="group-card">
+      <div class="group-title">🌅 Morning Protocol</div>
+      
+      <!-- 1. Wake Up -->
+      <div class="sub-item">
+        <div class="med-info">
+          <h3>1. Wake Up</h3>
+          <p>Dexlansoprazole (Empty stomach)</p>
+        </div>
+        <button class="btn-check" id="btn-wake" onclick="toggleMed('wake')">Take</button>
+      </div>
+
+      <!-- 2. Before Breakfast -->
+      <div class="sub-item">
+        <div class="med-info">
+          <h3>2. Before Breakfast</h3>
+          <p>Domperidone (15-30m before food)</p>
+        </div>
+        <button class="btn-check" id="btn-bfast" onclick="toggleMed('bfast')">Take</button>
+      </div>
+    </div>
+
+    <!-- EVENING CARD -->
+    <div class="card">
+      <div class="group-title">🌙 Evening Protocol</div>
+      <div class="sub-item" style="padding: 0;">
+        <div class="med-info">
+          <h3>3. Before Dinner</h3>
+          <p>Domperidone (15-30m before food)</p>
+        </div>
+        <button class="btn-check" id="btn-dinner" onclick="toggleMed('dinner')">Take</button>
+      </div>
+    </div>
+
+    <!-- SYMPTOM TRACKER WITH SLIDER -->
+    <div class="card">
+      <div class="group-title">📊 Daily Symptom Check</div>
+      <div class="slider-header">
+        <span style="font-size: 13px;">Stomach Discomfort Level:</span>
+        <span id="pain-val" style="font-weight: 700; color: var(--primary);">0 / 5</span>
+      </div>
+      <input type="range" min="0" max="5" value="0" id="pain-slider" class="slider" onchange="setPain(this.value)" oninput="updatePainLabel(this.value)">
+      <div class="slider-labels">
+        <span>0 (None)</span>
+        <span>5 (Severe)</span>
+      </div>
+      <textarea id="notes" rows="2" placeholder="Any side effects, nausea, or notes..." onchange="saveNotes()"></textarea>
     </div>
   </div>
 
-  <!-- Tab Navigation -->
+  <!-- LOG HISTORY TAB -->
+  <div id="app-history" class="hidden">
+    <h1>14-Day Log History</h1>
+    <div id="history-container"></div>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
   <div class="nav-bar">
     <div id="tab-today" class="nav-item active" onclick="switchTab('today')">
       <div class="nav-icon">📅</div>
@@ -180,187 +275,174 @@
     </div>
   </div>
 
-  <script>
-    // ⚠️ REPLACE THESE TWO WITH YOUR TELEGRAM BOT TOKEN AND CHAT ID ⚠️
-    const BOT_TOKEN = "8534787019:AAERXkGQ81ir7Hr-G613h3dnzm4IkpAudaA";
-    const CHAT_ID = "7160245708";
+<script>
+  const BOT_TOKEN = "8534787019:AAEUE_-A3BUjkXG60kfT2dAD5zyPDiKkxA";
+  const CHAT_ID = "7160245708";
 
-    let state = {
-      morningTaken: false,
-      eveningTaken: false,
-      painLevel: 2,
-      notes: ""
-    };
+  let state = {
+    wakeTaken: false,
+    bfastTaken: false,
+    dinnerTaken: false,
+    painLevel: 0,
+    notes: ""
+  };
 
-    const todayKey = new Date().toISOString().split('T')[0];
+  const todayKey = new Date().toISOString().split('T')[0];
 
-    function init() {
-      // Setup Start Date
-      if (!localStorage.getItem('startDate')) {
-        localStorage.setItem('startDate', new Date().toISOString());
-      }
+  function init() {
+    if (!localStorage.getItem('startDate')) {
+      localStorage.setItem('startDate', new Date().toISOString());
+    }
+
+    const lastDate = localStorage.getItem('lastDate');
+
+    // 🌅 MORNING SUMMARY: Send yesterday's report automatically if a new day has started
+    if (lastDate && lastDate !== todayKey) {
+      const prevSaved = localStorage.getItem(lastDate) ? JSON.parse(localStorage.getItem(lastDate)) : null;
       
-      const startDate = new Date(localStorage.getItem('startDate'));
-      const diffTime = Math.abs(new Date() - startDate);
-      const diffDays = Math.min(Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1, 14);
+      if (prevSaved) {
+        const summaryMsg = 
+          `🌅 MORNING SUMMARY (Yesterday's Report):\n` +
+          `• Stomach Discomfort Score: ${prevSaved.painLevel ?? 0}/5\n` +
+          `• Notes: ${prevSaved.notes || 'None'}\n` +
+          `• Med Adherence:\n` +
+          `   - Wake Up: ${prevSaved.wakeTaken ? '✅' : '❌'}\n` +
+          `   - Breakfast: ${prevSaved.bfastTaken ? '✅' : '❌'}\n` +
+          `   - Dinner: ${prevSaved.dinnerTaken ? '✅' : '❌'}`;
 
-      document.getElementById('progress-ring').innerText = `${diffDays}/14`;
-      document.getElementById('day-text').innerText = `Day ${diffDays} of 14`;
-
-      // Greeting
-      const hour = new Date().getHours();
-      let greeting = "Good morning,";
-      if (hour >= 12 && hour < 17) greeting = "Good afternoon,";
-      if (hour >= 17) greeting = "Good evening,";
-      document.getElementById('greeting').innerText = greeting;
-
-      // Load Saved State
-      const saved = localStorage.getItem(`log_${todayKey}`);
-      if (saved) {
-        state = JSON.parse(saved);
-        document.getElementById('pain-slider').value = state.painLevel;
-        document.getElementById('notes-input').value = state.notes || "";
-      }
-      updateUI();
-    }
-
-    function updateUI() {
-      // Morning UI
-      const mCard = document.getElementById('morning-card');
-      const mBtn = document.getElementById('morning-btn');
-      const mCheck = document.getElementById('morning-check');
-      if (state.morningTaken) {
-        mCard.classList.add('taken');
-        mBtn.classList.add('taken');
-        mBtn.innerText = "Mark as Not Taken";
-        mCheck.style.display = "block";
-      } else {
-        mCard.classList.remove('taken');
-        mBtn.classList.remove('taken');
-        mBtn.innerText = "Take Morning Doses";
-        mCheck.style.display = "none";
-      }
-
-      // Evening UI
-      const eCard = document.getElementById('evening-card');
-      const eBtn = document.getElementById('evening-btn');
-      const eCheck = document.getElementById('evening-check');
-      if (state.eveningTaken) {
-        eCard.classList.add('taken');
-        eBtn.classList.add('taken');
-        eBtn.innerText = "Mark as Not Taken";
-        eCheck.style.display = "block";
-      } else {
-        eCard.classList.remove('taken');
-        eBtn.classList.remove('taken');
-        eBtn.innerText = "Take Evening Dose";
-        eCheck.style.display = "none";
-      }
-
-      // Pain
-      const painVal = document.getElementById('pain-val');
-      painVal.innerText = `${state.painLevel}/10`;
-      if (state.painLevel > 5) {
-        painVal.classList.add('high');
-      } else {
-        painVal.classList.remove('high');
+        sendTelegramAlert(`Mom's Med Tracker:\n${summaryMsg}`);
       }
     }
+    
+    localStorage.setItem('lastDate', todayKey);
 
-    function toggleDose(type) {
-      if (type === 'morning') {
-        state.morningTaken = !state.morningTaken;
-        if (state.morningTaken) sendTelegram("✅ **Medication Update**: Mom took her **Morning (7:30 AM)** doses!");
-      } else {
-        state.eveningTaken = !state.eveningTaken;
-        if (state.eveningTaken) sendTelegram("✅ **Medication Update**: Mom took her **Evening (5:30 PM)** dose!");
-      }
-      saveData();
-      updateUI();
+    // Day Counter & Ring Calculation
+    const start = new Date(localStorage.getItem('startDate'));
+    const now = new Date();
+    const diffDays = Math.floor((now - start) / (1000 * 60 * 60 * 24)) + 1;
+    const currentDay = Math.min(Math.max(diffDays, 1), 14);
+
+    document.getElementById('day-counter').innerText = `Day ${currentDay} of 14`;
+    document.getElementById('today-date').innerText = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    document.getElementById('ring-label').innerText = `${currentDay}/14`;
+
+    // Ring stroke calculation
+    const ring = document.getElementById('progress-ring');
+    const strokeDashoffset = 188 - (188 * (currentDay / 14));
+    ring.style.strokeDashoffset = strokeDashoffset;
+
+    // Load saved data for today
+    const saved = localStorage.getItem(todayKey);
+    if (saved) {
+      state = JSON.parse(saved);
+    } else {
+      localStorage.setItem(todayKey, JSON.stringify(state));
     }
 
-    function onPainChange(val) {
-      state.painLevel = parseInt(val);
-      if (state.painLevel > 5) {
-        sendTelegram(`⚠️ **Discomfort Alert**: Mom logged a high pain level of **${state.painLevel}/10**.`);
-      }
-      saveData();
-      updateUI();
+    renderUI();
+  }
+
+  function renderUI() {
+    updateBtn('btn-wake', state.wakeTaken);
+    updateBtn('btn-bfast', state.bfastTaken);
+    updateBtn('btn-dinner', state.dinnerTaken);
+
+    const slider = document.getElementById('pain-slider');
+    const val = state.painLevel || 0;
+    slider.value = val;
+    updatePainLabel(val);
+
+    document.getElementById('notes').value = state.notes || '';
+  }
+
+  function updateBtn(id, isDone) {
+    const btn = document.getElementById(id);
+    if (isDone) {
+      btn.classList.add('done');
+      btn.innerText = '✓ Taken';
+    } else {
+      btn.classList.remove('done');
+      btn.innerText = 'Take';
     }
+  }
 
-    function saveData() {
-      state.notes = document.getElementById('notes-input').value;
-      localStorage.setItem(`log_${todayKey}`, JSON.stringify(state));
+  function toggleMed(type) {
+    if (type === 'wake') state.wakeTaken = !state.wakeTaken;
+    if (type === 'bfast') state.bfastTaken = !state.bfastTaken;
+    if (type === 'dinner') state.dinnerTaken = !state.dinnerTaken;
 
-      let history = JSON.parse(localStorage.getItem('history_keys') || "[]");
-      if (!history.includes(todayKey)) {
-        history.push(todayKey);
-        localStorage.setItem('history_keys', JSON.stringify(history));
-      }
-    }
+    saveAndNotify(`Medication update: ${type.toUpperCase()} set to ${state[type + 'Taken'] ? 'TAKEN' : 'UNCHECKED'}`);
+  }
 
-    function sendTelegram(text) {
-      if (BOT_TOKEN === "YOUR_BOT_TOKEN_HERE") return;
-      const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-      fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: CHAT_ID,
-          text: text,
-          parse_mode: 'Markdown'
-        })
-      }).catch(err => console.error("Telegram error:", err));
-    }
+  function updatePainLabel(val) {
+    document.getElementById('pain-val').innerText = `${val} / 5`;
+  }
 
-    function switchTab(tab) {
-      document.getElementById('today-page').classList.remove('active');
-      document.getElementById('history-page').classList.remove('active');
-      document.getElementById('tab-today').classList.remove('active');
+  function setPain(level) {
+    state.painLevel = parseInt(level, 10);
+    saveAndNotify(`Symptom score updated: ${level}/5`);
+  }
+
+  function saveNotes() {
+    state.notes = document.getElementById('notes').value;
+    saveAndNotify(`Note updated: "${state.notes}"`);
+  }
+
+  function saveAndNotify(msg) {
+    localStorage.setItem(todayKey, JSON.stringify(state));
+    renderUI();
+    sendTelegramAlert(`Mom's Med Tracker:\n${msg}`);
+  }
+
+  function sendTelegramAlert(message) {
+    if (!BOT_TOKEN || !CHAT_ID) return;
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: CHAT_ID, text: message })
+    }).catch(err => console.error(err));
+  }
+
+  function switchTab(tab) {
+    if (tab === 'today') {
+      document.getElementById('app-today').classList.remove('hidden');
+      document.getElementById('app-history').classList.add('hidden');
+      document.getElementById('tab-today').classList.add('active');
       document.getElementById('tab-history').classList.remove('active');
-
-      if (tab === 'today') {
-        document.getElementById('today-page').classList.add('active');
-        document.getElementById('tab-today').classList.add('active');
-      } else {
-        document.getElementById('history-page').classList.add('active');
-        document.getElementById('tab-history').classList.add('active');
-        renderHistory();
-      }
+    } else {
+      document.getElementById('app-today').classList.add('hidden');
+      document.getElementById('app-history').classList.remove('hidden');
+      document.getElementById('tab-today').classList.remove('active');
+      document.getElementById('tab-history').classList.add('active');
+      renderHistory();
     }
+  }
 
-    function renderHistory() {
-      const historyKeys = JSON.parse(localStorage.getItem('history_keys') || "[]");
-      const list = document.getElementById('history-list');
-      list.innerHTML = "";
-
-      if (historyKeys.length === 0) {
-        list.innerHTML = "<div style='color:var(--subtext); text-align:center; padding:30px;'>No logs saved yet.</div>";
-        return;
-      }
-
-      historyKeys.reverse().forEach(key => {
-        const item = JSON.parse(localStorage.getItem(`log_${key}`));
-        if (!item) return;
-
+  function renderHistory() {
+    const container = document.getElementById('history-container');
+    container.innerHTML = '';
+    
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const item = JSON.parse(localStorage.getItem(key));
         const div = document.createElement('div');
-        div.className = "history-card";
-        div.style.marginBottom = "10px";
+        div.className = 'history-log';
         div.innerHTML = `
-          <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:8px;">
-            <span>📅 ${key}</span>
-            <span style="color:${item.painLevel > 5 ? 'var(--red)' : 'var(--green)'}">Pain: ${item.painLevel}/10</span>
-          </div>
-          <div style="font-size:13px; color:var(--subtext);">
-            Morning: ${item.morningTaken ? '✅ Taken' : '❌ Missed'} | Evening: ${item.eveningTaken ? '✅ Taken' : '❌ Missed'}
-          </div>
-          ${item.notes ? `<div style="font-size:12px; italic; margin-top:6px; color:#555;">Note: "${item.notes}"</div>` : ''}
+          <strong>${key}</strong><br>
+          • Wake (Dexlansoprazole): ${item.wakeTaken ? '✅' : '❌'}<br>
+          • BFast (Domperidone): ${item.bfastTaken ? '✅' : '❌'}<br>
+          • Dinner (Domperidone): ${item.dinnerTaken ? '✅' : '❌'}<br>
+          • Pain Score: ${item.painLevel ?? 0}/5<br>
+          • Notes: ${item.notes || 'None'}
         `;
-        list.appendChild(div);
-      });
+        container.appendChild(div);
+      }
     }
+  }
 
-    init();
-  </script>
+  init();
+</script>
 </body>
 </html>
